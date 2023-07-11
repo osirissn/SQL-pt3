@@ -1,0 +1,65 @@
+ DML 
+
+	-- 1 Liste o título e a descrição do filme ordenados pelo título em ordem descendente:
+
+SELECT title, description FROM film ORDER BY title DESC;
+
+	-- 2  Liste o título e a descrição do filme, ordenando pelo título do filme de forma ascendente e a descrição de forma descendente:
+
+SELECT title, description FROM film ORDER BY title ASC, description DESC;
+
+	-- 3 Liste os diferentes valores de taxa de locação (rental_rate) do filme:
+
+SELECT DISTINCT rental_rate FROM film;
+
+	-- 4 Liste o total/quantidade de filmes com duração de locação (rental_duration) igual a 7:
+
+SELECT COUNT(*) AS total_filmes FROM film WHERE rental_duration = 7;
+
+	--  5 Liste o título, taxa de locação atual (rental_rate) e o valor da taxa de locação dos filmes acrescentando R$ 1,50 em cada filme:
+
+SELECT title, rental_rate, rental_rate + 1.50 AS nova_taxa_locacao FROM film;
+	
+	--  6 Liste os filmes que possuem categoria cadastrada (Utilize o IN):
+
+SELECT * FROM film WHERE film_id IN (SELECT film_id FROM film_category);
+
+	-- 7 Liste os filmes que Não possuem categoria cadastrada (Utilize o IN):
+
+SELECT * FROM film WHERE film_id NOT IN (SELECT film_id FROM film_category);
+
+	-- 8 Liste todos os filmes caso exista alguma categoria cadastrada para algum filme (Utilize o EXISTS):
+
+SELECT * FROM film WHERE EXISTS (SELECT * FROM film_category WHERE film.film_id = film_category.film_id);
+
+	/* 9  Utilizando a cláusula CASE, exiba o título do filme concatenado com o texto 
+     'muitos dias', caso o tempo de locação seja de 7 dias do filme. Caso o tempo 
+     de locação seja de 3 dias, então exiba o título concatenando com 'Poucos Dias'. Caso contrário,
+    exiba a mensagem 'Só final de Semana': */
+
+SELECT 
+  title,
+  CASE
+    WHEN rental_duration = 7 THEN CONCAT(title, ' muitos dias')
+    WHEN rental_duration = 3 THEN CONCAT(title, ' Poucos Dias')
+    ELSE 'Só final de Semana'
+  END AS mensagem
+FROM film;
+
+	-- 10  Realize uma subconsulta na cláusula FROM que liste somente os filmes com duração de locação igual a 7:
+
+SELECT * FROM (SELECT * FROM film WHERE rental_duration = 7) AS subquery;
+
+	-- 11  Realize uma subconsulta no SELECT para listar o título do filme e o total de filmes cadastrados:
+
+SELECT title, (SELECT COUNT(*) FROM film) AS total_filmes FROM film;
+
+	-- 12  Realize uma subconsulta no SELECT para listar o título do filme e a quantidade de categorias que este filme possui vinculada:
+
+SELECT title, (SELECT COUNT(*) FROM film_category WHERE film.film_id = film_category.film_id) AS quantidade_categorias FROM film;
+
+	--  13  Utilizando o OUTER JOIN, liste todas as línguas (Tabela Language), mesmo que a língua não esteja vinculada com o filme:
+
+SELECT language.name, film.film_id
+FROM language
+LEFT JOIN film ON language.language_id = film.language_id;
